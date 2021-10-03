@@ -13,6 +13,6 @@ public interface LeaveManagementRepository extends JpaRepository<LeaveManagement
 	
 	@Query(value="select * from LeaveManagement where LeaveManagement.empId=?1 "
 			+ "and year(LeaveManagement.requestedDate)=?2", nativeQuery = true)
-	List<LeaveManagement> findAllByEmpIdAndLeaveMonth(int empId, int year);
+	List<LeaveManagement> findAllByEmpIdAndLeaveYear(int empId, int year);
 
 }

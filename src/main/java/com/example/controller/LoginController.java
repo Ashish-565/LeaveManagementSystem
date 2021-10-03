@@ -34,16 +34,16 @@ public class LoginController {
 	BossService bossService;
 
 	@PostMapping("/employee")
-	public ResponseEntity<?> loginEmployee(@RequestBody LoginRequest loginRequest) {
-		int id = loginRequest.getId();
+	public ResponseEntity<?> loginEmployee(@RequestBody RequestWithId requestWithId) {
+		int id = requestWithId.getId();
 		Employee employee = employeeService.getEmployee(id);
 		logger.info(ResponseEntity.status(HttpStatus.OK).body(employee).toString());
 		return ResponseEntity.status(HttpStatus.OK).body(employee);
 	}
 
 	@PostMapping("/boss")
-	public ResponseEntity<?> loginBoss(@RequestBody LoginRequest loginRequest) {
-		int id = loginRequest.getId();
+	public ResponseEntity<?> loginBoss(@RequestBody RequestWithId requestWithId) {
+		int id = requestWithId.getId();
 		Boss boss = bossService.getBoss(id);
 		logger.info(ResponseEntity.status(HttpStatus.OK).body(boss).toString());
 		return ResponseEntity.status(HttpStatus.OK).body(boss);

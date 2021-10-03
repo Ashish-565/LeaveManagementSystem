@@ -37,10 +37,10 @@ public class LeaveManagementServiceImpl implements LeaveManagementService{
 	HistoryResponseRepository historyResponseRepository;
 	
 	@Override
-	public Status getRequestStatus(int empId, Date reqDate, int reqLeaves, String reason) {
+	public Employee getEmployeeAfterRequest(int empId, Date reqDate, int reqLeaves, String reason) {
 		@SuppressWarnings("deprecation")
 		int year = reqDate.getYear();
-		List<LeaveManagement> leaves = leaveManagementRepository.findAllByEmpIdAndLeaveMonth(empId, year);
+		List<LeaveManagement> leaves = leaveManagementRepository.findAllByEmpIdAndLeaveYear(empId, year);
 		int totalLeaves = 0;
 		for(LeaveManagement leave: leaves) {
 			if(Status.CONFORMED.equals(leave.getConformStatus())) {
@@ -53,7 +53,7 @@ public class LeaveManagementServiceImpl implements LeaveManagementService{
 		
 		LeaveManagement leave = new LeaveManagement();
 		if(totalLeaves+reqLeaves > empRemainingLeaves) {
-			return Status.REJECTED;
+			return emp;
 		}else {
 			leave.setEmpId(empId);
 			leave.setRequestedDate(reqDate);
@@ -64,7 +64,7 @@ public class LeaveManagementServiceImpl implements LeaveManagementService{
 			
 			emp.setLeavesRemaining(emp.getLeavesRemaining()-reqLeaves);
 			employeeRepository.save(emp);
-			return Status.PENDING;
+			return emp;
 		}
 	}
 	
@@ -80,6 +80,23 @@ public class LeaveManagementServiceImpl implements LeaveManagementService{
 		List<HistoryResponse> allLeaves = historyResponseRepository.employeeHistory(empId);
 		logger.info(""+allLeaves);
 		return allLeaves;
+	}
+
+	@Override
+	public void grantLeave(int leaveId) {
+		LeaveManagement leave = leaveManagementRepository.getById(leaveId);
+		leave.setConformStatus(Status.CONFORMED);
+		leaveManagementRepository.save(leave);
+	}
+
+	@Override
+	public void rejectLeave(int leaveId) {
+		LeaveManagement leave = leaveManagementRepository.getById(leaveId);
+		leave.setConformStatus(Status.REJECTED);
+		leaveManagementRepository.save(leave);
+		Employee employee = employeeRepository.getById(leave.getEmpId());
+		employee.setLeavesRemaining(employee.getLeavesRemaining()+leave.getNoOfDays());
+		employeeRepository.save(employee);
 	}
 
 }
