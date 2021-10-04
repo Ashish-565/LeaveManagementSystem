@@ -12,12 +12,12 @@ import com.example.model.HistoryResponse;
 public interface HistoryResponseRepository extends JpaRepository<HistoryResponse, Integer>{
 
 	@Query(value="select LeaveManagement.leaveId as sNo, "
-			+ "Boss.bossName, "
+			+ "b.bossName, "
 			+ "LeaveManagement.noOfDays, "
 			+ "LeaveManagement.requestedDate, "
 			+ "LeaveManagement.reason, "
 			+ "LeaveManagement.conformStatus "
-			+ "from Boss, LeaveManagement "
+			+ "from LeaveManagement left join (select * from Boss)b on LeaveManagement.bossId=b.bossId "
 			+ "where LeaveManagement.empId=?1"
 			, nativeQuery = true)
 	List<HistoryResponse> employeeHistory(int empId);

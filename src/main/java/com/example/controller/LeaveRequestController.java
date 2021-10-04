@@ -38,17 +38,19 @@ public class LeaveRequestController {
 	}
 	
 	@PostMapping("/grant")
-	public ResponseEntity<?> grantLeave(@RequestBody RequestWithId requestWithId){
-		int leaveId = requestWithId.getId();
-		leaveManagementService.grantLeave(leaveId);
+	public ResponseEntity<?> grantLeave(@RequestBody RequestWithLeaveIdAndBossId requestWithLeaveIdAndBossId){
+		int leaveId = requestWithLeaveIdAndBossId.getId();
+		int bossId = requestWithLeaveIdAndBossId.getBossId();
+		leaveManagementService.grantLeave(leaveId, bossId);
 		List<LeaveResponse> leaves = leaveManagementService.getPendingLeaves();
 		return ResponseEntity.status(HttpStatus.OK).body(leaves);
 	}
 	
 	@PostMapping("/reject")
-	public ResponseEntity<?> rejectLeave(@RequestBody RequestWithId requestWithId){
-		int leaveId = requestWithId.getId();
-		leaveManagementService.rejectLeave(leaveId);
+	public ResponseEntity<?> rejectLeave(@RequestBody RequestWithLeaveIdAndBossId requestWithLeaveIdAndBossId){
+		int leaveId = requestWithLeaveIdAndBossId.getId();
+		int bossId = requestWithLeaveIdAndBossId.getBossId();
+		leaveManagementService.rejectLeave(leaveId, bossId);
 		List<LeaveResponse> leaves = leaveManagementService.getPendingLeaves();
 		return ResponseEntity.status(HttpStatus.OK).body(leaves);
 	}

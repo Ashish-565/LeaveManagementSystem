@@ -12,6 +12,7 @@ import com.example.model.HistoryResponse;
 import com.example.model.LeaveManagement;
 import com.example.model.LeaveResponse;
 import com.example.model.Status;
+import com.example.repository.BossRepository;
 import com.example.repository.EmployeeRepository;
 import com.example.repository.HistoryResponseRepository;
 import com.example.repository.LeaveManagementRepository;
@@ -28,7 +29,10 @@ public class LeaveManagementServiceImpl implements LeaveManagementService{
 	LeaveManagementRepository leaveManagementRepository;
 	
 	@Autowired
-	EmployeeRepository employeeRepository; 
+	EmployeeRepository employeeRepository;
+	
+	@Autowired
+	BossRepository bossRepository;
 	
 	@Autowired
 	LeaveResponseRepository leaveResponseRepository;
@@ -77,21 +81,36 @@ public class LeaveManagementServiceImpl implements LeaveManagementService{
 
 	@Override
 	public List<HistoryResponse> getAllEmployeeLeaves(int empId) {
+		List<LeaveManagement> employeeLeaves = leaveManagementRepository.findEmployeeLeaves(empId);
 		List<HistoryResponse> allLeaves = historyResponseRepository.employeeHistory(empId);
+		logger.info(""+allLeaves+" "+employeeLeaves);
+		for(int i=0; i<allLeaves.size(); i++) {
+			if(allLeaves.get(i).getSNo()==employeeLeaves.get(i).getLeaveId()) {
+				int bossId = employeeLeaves.get(i).getBossId();
+				logger.info(""+bossId);
+				if(bossId==0) {
+					allLeaves.get(i).setBossName("-");
+				}else {
+					allLeaves.get(i).setBossName(bossRepository.findById(bossId).get().getBossName());
+				}
+			}
+		}
 		logger.info(""+allLeaves);
 		return allLeaves;
 	}
 
 	@Override
-	public void grantLeave(int leaveId) {
+	public void grantLeave(int leaveId, int bossId) {
 		LeaveManagement leave = leaveManagementRepository.getById(leaveId);
+		leave.setBossId(bossId);
 		leave.setConformStatus(Status.CONFORMED);
 		leaveManagementRepository.save(leave);
 	}
 
 	@Override
-	public void rejectLeave(int leaveId) {
+	public void rejectLeave(int leaveId, int bossId) {
 		LeaveManagement leave = leaveManagementRepository.getById(leaveId);
+		leave.setBossId(bossId);
 		leave.setConformStatus(Status.REJECTED);
 		leaveManagementRepository.save(leave);
 		Employee employee = employeeRepository.getById(leave.getEmpId());

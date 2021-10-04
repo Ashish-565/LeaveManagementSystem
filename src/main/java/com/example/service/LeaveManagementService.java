@@ -11,9 +11,9 @@ public interface LeaveManagementService {
 
 	Employee getEmployeeAfterRequest(int empId, Date reqDate, int reqLeaves, String reason); 
 	
-	void grantLeave(int leaveId);
+	void grantLeave(int leaveId, int bossId);
 	
-	void rejectLeave(int leaveId);
+	void rejectLeave(int leaveId, int bossId);
 	
 	List<LeaveResponse> getPendingLeaves();
 	
